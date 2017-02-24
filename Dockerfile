@@ -8,9 +8,11 @@ RUN apk update \
     && apk add --update --no-cache \
         musl build-base python3 python3-dev openssl-dev libffi-dev \
         ca-certificates openssl openssh-client rsync git bash \
-    && pip3 install --no-cache-dir --upgrade pip \
-    && git clone https://github.com/Azure/batch-shipyard.git /opt/batch-shipyard \
+    && pip3 install --no-cache-dir --upgrade pip
+
+RUN  git clone https://github.com/pareshverma91/batch-shipyard.git /opt/batch-shipyard \
     && cd /opt/batch-shipyard \
+    && git checkout LoadConfigFromMemory \
     && rm -rf .git \
     && rm -f .git* .travis.yml install* \
     && pip3 install -r requirements.txt \
