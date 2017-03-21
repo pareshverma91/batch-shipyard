@@ -145,6 +145,18 @@ class CliContext(object):
         self._cleanup_after_initialize(
             skip_global_config=False, skip_pool_config=False)
 
+    def cleanup_after_run(self):
+        # type: (CliContext) -> None
+        """Cleanup after an execution.
+        :param CliContext self: this
+        """
+        # Storage clients do not close their sessions, hence close them explicitly.
+        storage_clients = ['blob_client', 'queue_client', 'table_client']
+        for storage_client in storage_clients:
+            client = getattr(self, storage_client)
+            if client:
+                client.request_session.close()
+
     def _set_global_cli_options(self):
         # type: (CliContext) -> None
         """Set global cli options
@@ -662,6 +674,12 @@ def fs_cluster_options(f):
 def cli(ctx):
     """Batch Shipyard: Provision and Execute Docker Workloads on Azure Batch"""
     pass
+
+
+@cli.resultcallback()
+@pass_cli_context
+def cli_cleanup(ctx):
+    ctx.cleanup_after_run()
 
 
 @cli.group()
